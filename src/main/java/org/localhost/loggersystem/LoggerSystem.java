@@ -78,7 +78,7 @@ public class LoggerSystem {
 
         if (user.getLogAccessType() == LogAccessType.BASIC) {
             List<Log> userLogs = activeLogs.stream()
-                    .filter(log -> log.getLogAccessType() != LogAccessType.BASIC)
+                    .filter(log -> log.getLogAccessType() == LogAccessType.BASIC)
                     .filter(log -> log.getCreator().equals(user))
                     .toList();
             return userLogs;
