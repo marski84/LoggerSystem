@@ -3,10 +3,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -28,9 +26,10 @@ public class LoggerSystem {
         activeLogs.add(log);
     }
 
-    public void deleteLog(Long logId, LogCreator user) {
+    public void deleteLog(Long logId, Long userId) {
         validateDeleteLogInput(logId);
-        validateUserData(user);
+        validateUserData(userId);
+        LogCreator user = userService.getUserData(userId);
 
         Optional<Log> logToDelete = activeLogs.stream().filter(log -> log.getId().equals(logId)).findFirst();
         logToDelete.ifPresentOrElse(
@@ -71,8 +70,8 @@ public class LoggerSystem {
                     .filter(log -> log.getCreator().equals(user))
                     .toList();
 
-           resultList = Arrays.asList(basicUsersLogs, userLogs).stream()
-                    .flatMap(list -> list.stream())
+           resultList = Stream.of(basicUsersLogs, userLogs)
+                    .flatMap(Collection::stream)
                     .toList();
         }
 
@@ -107,8 +106,8 @@ public class LoggerSystem {
         }
     }
 
-    private void validateUserData(LogCreator user) {
-        if (user == null) {
+    private void validateUserData(Long userId) {
+        if (userId == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
     }

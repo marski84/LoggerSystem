@@ -64,7 +64,7 @@ class LoggerSystemTest {
                 .toList()
                 .size();
 //        when
-        objectUnderTest.deleteLog(31113L, userService.getLogCreators().get(1));
+        objectUnderTest.deleteLog(31113L, userService.getLogCreators().get(1).getUserId());
 //        then
         Assertions.assertEquals(expectedLogsSize, objectUnderTest.getActiveLogs().size());
 
@@ -84,7 +84,7 @@ class LoggerSystemTest {
 
         int expectedDeletedLogsSize = objectUnderTest.getDeletedLogs().size() + 1;
 
-        objectUnderTest.deleteLog(31313L, owner);
+        objectUnderTest.deleteLog(31313L, owner.getUserId());
         Assertions.assertEquals(expectedLogsSize, objectUnderTest.getActiveLogs().size());
         Assertions.assertEquals(expectedDeletedLogsSize, objectUnderTest.getDeletedLogs().size());
     }
@@ -102,7 +102,7 @@ class LoggerSystemTest {
 
         int expectedDeletedLogsSize = objectUnderTest.getDeletedLogs().size() + 1;
 
-        objectUnderTest.deleteLog(31313L, admin);
+        objectUnderTest.deleteLog(31313L, admin.getUserId());
         Assertions.assertEquals(startingLogsSize, objectUnderTest.getActiveLogs().size());
         Assertions.assertEquals(expectedDeletedLogsSize, objectUnderTest.getDeletedLogs().size());
 
@@ -122,7 +122,7 @@ class LoggerSystemTest {
 
         int expectedDeletedLogsSize = objectUnderTest.getDeletedLogs().size() + 1;
 
-        objectUnderTest.deleteLog(31313L, user);
+        objectUnderTest.deleteLog(31313L, user.getUserId());
         Assertions.assertEquals(startingLogsSize, objectUnderTest.getActiveLogs().size());
         Assertions.assertEquals(expectedDeletedLogsSize, objectUnderTest.getDeletedLogs().size());
     }
@@ -133,7 +133,7 @@ class LoggerSystemTest {
 //      given
         LogCreator user = userService.getLogCreators().get(0);
 //      when, then
-        Assertions.assertThrows(RuntimeException.class, () -> objectUnderTest.deleteLog(42352L, user));
+        Assertions.assertThrows(RuntimeException.class, () -> objectUnderTest.deleteLog(42352L, user.getUserId()));
     }
 
     @Test
@@ -142,7 +142,7 @@ class LoggerSystemTest {
 //      given
         LogCreator admin = userService.getLogCreators().get(1);
 //      when, then
-        Assertions.assertThrows(RuntimeException.class, () -> objectUnderTest.deleteLog(42352L, admin));
+        Assertions.assertThrows(RuntimeException.class, () -> objectUnderTest.deleteLog(42352L, admin.getUserId()));
     }
 
     @Test
