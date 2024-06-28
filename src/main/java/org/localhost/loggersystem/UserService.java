@@ -38,9 +38,8 @@ public class UserService {
         }
 
         return logCreators.stream()
-                .filter(user -> user.getUserId().equals(userId)).
-                findFirst().
-                orElse(null);
+                .filter(user -> user.getUserId().equals(userId))
+                .toList().get(0);
     }
 
 }

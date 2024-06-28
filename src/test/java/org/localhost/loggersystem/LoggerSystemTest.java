@@ -1,15 +1,11 @@
 package org.localhost.loggersystem;
 
 import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 class LoggerSystemTest {
-    private static final Logger log = LoggerFactory.getLogger(LoggerSystemTest.class);
     //    init test data
     private final UserService userService = new UserService();
     private final LoggerSystem objectUnderTest = new LoggerSystem(userService);
@@ -70,7 +66,7 @@ class LoggerSystemTest {
 //        when
         objectUnderTest.deleteLog(31113L, userService.getLogCreators().get(1));
 //        then
-        Assertions.assertEquals(objectUnderTest.getActiveLogs().size(), 2);
+        Assertions.assertEquals(expectedLogsSize, objectUnderTest.getActiveLogs().size());
 
     }
 
@@ -147,6 +143,13 @@ class LoggerSystemTest {
         LogCreator admin = userService.getLogCreators().get(1);
 //      when, then
         Assertions.assertThrows(RuntimeException.class, () -> objectUnderTest.deleteLog(42352L, admin));
+    }
+
+    @Test
+    @DisplayName("it shoudl throw when user is empty")
+    void throwWhenUserIsEmpty() {
+        //      when, then
+        Assertions.assertThrows(IllegalArgumentException.class, () -> objectUnderTest.deleteLog(42352L, null));
     }
 
 
