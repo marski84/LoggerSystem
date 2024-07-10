@@ -1,17 +1,16 @@
-package org.localhost.loggersystem;
+package org.localhost.userModule;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
+import org.localhost.LoggerSystemModule.LogAccessType;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogCreator {
-    private Long userId;
+public class User {
+    private long userId;
     private String userName;
     private LogAccessType logAccessType;
 }

@@ -1,4 +1,4 @@
-package org.localhost.loggersystem;
+package org.localhost.LoggerSystemModule;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

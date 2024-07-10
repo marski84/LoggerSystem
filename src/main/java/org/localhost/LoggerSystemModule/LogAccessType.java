@@ -1,4 +1,4 @@
-package org.localhost.loggersystem;
+package org.localhost.LoggerSystemModule;
 
 public enum LogAccessType {
     BASIC, ADMIN, OWNER

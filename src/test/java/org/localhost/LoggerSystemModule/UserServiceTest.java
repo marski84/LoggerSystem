@@ -1,4 +1,4 @@
-package org.localhost.loggersystem;
+package org.localhost.LoggerSystemModule;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.localhost.userModule.User;
+import org.localhost.userModule.UserService;
 
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,23 +22,23 @@ class UserServiceTest {
     @DisplayName("it should init user list")
     void createUserList() {
 //        given
-        LogCreator testUser = new LogCreator(666l, "Testowy", LogAccessType.ADMIN);
-        LogCreator secondTestUser = new LogCreator(667l, "TestowyKolejny", LogAccessType.BASIC);
+        User testUser = new User(666l, "Testowy", LogAccessType.ADMIN);
+        User secondTestUser = new User(667l, "TestowyKolejny", LogAccessType.BASIC);
 //        when
         objectUnderTest.createUser(666l, "Testowy", LogAccessType.ADMIN);
         objectUnderTest.createUser(667l, "TestowyKolejny", LogAccessType.BASIC);
 
-        LinkedList<LogCreator> expectedLogCreators = new LinkedList<>();
-        expectedLogCreators.add(testUser);
-        expectedLogCreators.add(secondTestUser);
+        LinkedList<User> expectedUsers = new LinkedList<>();
+        expectedUsers.add(testUser);
+        expectedUsers.add(secondTestUser);
 
         Assertions.assertEquals(
-                expectedLogCreators.get(0).getUserId(),
-                objectUnderTest.getLogCreators().get(0).getUserId()
+                expectedUsers.get(0).getUserId(),
+                objectUnderTest.getUsers().get(0).getUserId()
         );
         Assertions.assertEquals(
-                expectedLogCreators.get(1).getUserId(),
-                objectUnderTest.getLogCreators().get(1).getUserId()
+                expectedUsers.get(1).getUserId(),
+                objectUnderTest.getUsers().get(1).getUserId()
         );
     }
 
@@ -51,7 +53,7 @@ class UserServiceTest {
     @ParameterizedTest
     @MethodSource("generateInvalidData")
     @DisplayName("It should throw when any argument of createUser is null")
-    void throwWhenNull(Long id, String name, LogAccessType logAccessType) {
+    void throwWhenNull(long id, String name, LogAccessType logAccessType) {
         // when, then
         assertThrows(IllegalArgumentException.class, () ->
                 objectUnderTest.createUser(id, name, logAccessType)
@@ -85,13 +87,13 @@ class UserServiceTest {
     void getUserDataReturns() {
 //        given
         objectUnderTest.createUser(666l, "Testowy", LogAccessType.ADMIN);
-        LogCreator resultUser = objectUnderTest.getUserData(666l);
+        Optional<User> resultUser = objectUnderTest.getUserData(666l);
 //        when
-        LogCreator expectedUser = new LogCreator(666l, "Testowy", LogAccessType.ADMIN);
+        User expectedUser = new User(666l, "Testowy", LogAccessType.ADMIN);
 //        then
-        Assertions.assertEquals(expectedUser.getUserName(), resultUser.getUserName());
-        Assertions.assertEquals(expectedUser.getUserId(), resultUser.getUserId());
-        Assertions.assertEquals(expectedUser.getLogAccessType(), resultUser.getLogAccessType());
+        Assertions.assertEquals(expectedUser.getUserName(), resultUser.get().getUserName());
+        Assertions.assertEquals(expectedUser.getUserId(), resultUser.get().getUserId());
+        Assertions.assertEquals(expectedUser.getLogAccessType(), resultUser.get().getLogAccessType());
     }
     @Test
     @DisplayName("getUserData should throw when user doesn't exist")
@@ -101,11 +103,4 @@ class UserServiceTest {
                 () -> objectUnderTest.getUserData(666l));
     }
 
-    @Test
-    @DisplayName("getUserData should throw when user is given as null")
-    void getUserDataThrowsWhenUserNull() {
-//        when, then
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> objectUnderTest.getUserData(null));
-    }
 }
