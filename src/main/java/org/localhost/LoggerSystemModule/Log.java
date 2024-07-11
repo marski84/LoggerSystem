@@ -20,7 +20,7 @@ public class Log {
     private LogAccessType logAccessType;
     private String logMessage;
 
-    public Log(Long id, LocalDateTime localDateTime, User creator, String logMessage) {
+    public Log(long id, LocalDateTime localDateTime, User creator, String logMessage) {
         Objects.requireNonNull(creator);
         this.id = id;
         this.localDateTime = localDateTime;
@@ -32,5 +32,17 @@ public class Log {
 
     public void showLog() {
         log.info(logMessage);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Log log)) return false;
+        return id == log.id && Objects.equals(localDateTime, log.localDateTime) && Objects.equals(creator, log.creator) && logAccessType == log.logAccessType && Objects.equals(logMessage, log.logMessage);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, localDateTime, creator, logAccessType, logMessage);
     }
 }
