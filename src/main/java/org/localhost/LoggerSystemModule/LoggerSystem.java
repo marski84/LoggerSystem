@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class LoggerSystem {
+public class LoggerSystem implements LoggerSystemInterface {
     private final Set<Log> deletedLogs = new HashSet<>();
     private final Set<Log> activeLogs = new HashSet<>();
     private final UserService userService;
@@ -55,7 +55,7 @@ public class LoggerSystem {
     }
 
     //    TODO switch + dedykowane metody
-    Set<Log> getLogsForUser(long userId) {
+    public Set<Log> getLogsForUser(long userId) {
         if (!userService.userExists(userId)) {
             throw new IllegalArgumentException("User not found");
         }
@@ -127,7 +127,7 @@ public class LoggerSystem {
         return new ArrayList<>(activeLogs);
     }
 
-    public Collection<Object> getDeletedLogs() {
+    public List<Log> getDeletedLogs() {
         return  new ArrayList<>(deletedLogs);
     }
 }

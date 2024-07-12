@@ -11,7 +11,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @Service
-public class UserService {
+public class UserService implements UserServiceInterface {
     private final LinkedList<User> users = new LinkedList<>();
 
 
