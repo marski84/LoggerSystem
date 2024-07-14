@@ -26,9 +26,23 @@ class LoggerSystemTest {
         userService.createUser(1234217L, "Owner", LogAccessType.OWNER);
 
 
-        Log firstLog = new Log(31313L, LocalDateTime.now(), userService.getAllUsers().get(0), "user log");
-        Log secondLog = new Log(31113L, LocalDateTime.now(), userService.getAllUsers().get(1), "admin log");
-        Log thirdLog = new Log(42352L, LocalDateTime.now(), userService.getAllUsers().get(2), "owner log");
+        Log firstLog = new Log(
+                31313L,
+                LocalDateTime.now(),
+                userService.getAllUsers().stream().filter(user -> user.getLogAccessType() == LogAccessType.BASIC).findFirst().get()
+                , "user log"
+        );
+        Log secondLog = new Log(
+                31113L,
+                LocalDateTime.now(),
+                userService.getAllUsers().stream().filter(user -> user.getLogAccessType() == LogAccessType.ADMIN).findFirst().get(),
+                "admin log"
+        );
+        Log thirdLog = new Log(
+                42352L,
+                LocalDateTime.now(),
+                userService.getAllUsers().stream().filter(user -> user.getLogAccessType() == LogAccessType.OWNER).findFirst().get(),
+                "owner log");
 
         objectUnderTest.createLog(firstLog);
         objectUnderTest.createLog(secondLog);
@@ -62,7 +76,8 @@ class LoggerSystemTest {
                 .toList()
                 .size();
 //        when
-        objectUnderTest.deleteLog(31113L, userService.getAllUsers().get(1).getUserId());
+        objectUnderTest.deleteLog(31113L,
+                userService.getAllUsers().stream().filter(user -> user.getLogAccessType() == LogAccessType.OWNER).findFirst().get().getUserId());
 //        then
         Assertions.assertEquals(expectedLogsSize, objectUnderTest.getActiveLogs().size());
 
@@ -133,7 +148,7 @@ class LoggerSystemTest {
     @DisplayName("it should when user with accessType = basic tries to delete log with owner level")
     void throwWhenDeleteByUserNotValid() {
 //      given
-        User user = userService.getAllUsers().get(0);
+        User user = userService.getAllUsers().stream().filter(result -> result.getLogAccessType() == LogAccessType.BASIC).findFirst().get();
 //      when, then
         Assertions.assertThrows(AccessDeniedException.class, () -> objectUnderTest.deleteLog(42352L, user.getUserId()));
     }
@@ -142,7 +157,7 @@ class LoggerSystemTest {
     @DisplayName("it should when user with accessType = admin tries to delete log with owner level")
     void throwWhenDeleteByAdminNotValid() {
 //      given
-        User admin = userService.getAllUsers().get(1);
+        User admin = userService.getAllUsers().stream().filter(result -> result.getLogAccessType() == LogAccessType.ADMIN).findFirst().get();
 //      when, then
         Assertions.assertThrowsExactly(AccessDeniedException.class, () -> objectUnderTest.deleteLog(42352L, admin.getUserId()));
 
@@ -155,7 +170,7 @@ class LoggerSystemTest {
     @DisplayName("It should return valid list of logs for access type= owner")
     void getActiveLogsForOwner() throws UserNotFoundException {
 //        given
-        User owner = userService.getAllUsers().get(2);
+        User owner = userService.getAllUsers().stream().filter(result -> result.getLogAccessType() == LogAccessType.OWNER).findFirst().get();
         Log additaionalTestLog = new Log(1111L, LocalDateTime.now(), owner, "second owner log");
         objectUnderTest.createLog(additaionalTestLog);
         int expectedLogListSize = objectUnderTest.getActiveLogs().size();
@@ -169,7 +184,7 @@ class LoggerSystemTest {
     @DisplayName("It should return valid list of logs for access type= admin")
     void getActiveLogsForAdmin() throws UserNotFoundException {
 //        given
-        User admin = userService.getAllUsers().get(1);
+        User admin = userService.getAllUsers().stream().filter(result -> result.getLogAccessType() == LogAccessType.ADMIN).findFirst().get();
 
         Log additaionalTestLog = new Log(1111L, LocalDateTime.now(), admin, "second admin log");
         objectUnderTest.createLog(additaionalTestLog);
@@ -187,7 +202,8 @@ class LoggerSystemTest {
     @DisplayName("It should return valid list of logs for access type= basic")
     void getActiveLogsForUser() throws UserNotFoundException {
 //        given
-        User user = userService.getAllUsers().get(0);
+        User user = userService.getAllUsers().stream().filter(resultUser -> resultUser.getLogAccessType() == LogAccessType.BASIC).findFirst().get();
+
         int expectedLogListSize = objectUnderTest.getActiveLogs().stream()
                 .filter(log -> log.getCreator().equals(user) && log.getLogAccessType() == LogAccessType.BASIC)
                 .toList()

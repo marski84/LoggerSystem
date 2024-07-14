@@ -3,14 +3,13 @@ package org.localhost.userModule;
 import org.localhost.LoggerSystemModule.LogAccessType;
 import org.localhost.interfaces.UserServiceInterface;
 import org.springframework.stereotype.Service;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 
 
 @Service
 public class UserService implements UserServiceInterface {
-    private final LinkedList<User> users = new LinkedList<>();
+    private final HashSet<User> users = new HashSet<>();
 
 
     public void createUser(long userId, String userName, LogAccessType logAccessType) {
@@ -34,7 +33,7 @@ public class UserService implements UserServiceInterface {
     }
 
     public List<User> getAllUsers() {
-        return List.copyOf(users);
+        return new ArrayList<>(Set.copyOf(users));
     }
 
 }
