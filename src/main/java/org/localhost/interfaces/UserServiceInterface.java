@@ -1,6 +1,7 @@
-package org.localhost.userModule;
+package org.localhost.interfaces;
 
 import org.localhost.LoggerSystemModule.LogAccessType;
+import org.localhost.userModule.User;
 
 import java.util.Optional;
 

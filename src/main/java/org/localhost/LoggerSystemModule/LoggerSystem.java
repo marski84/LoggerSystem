@@ -1,6 +1,10 @@
 package org.localhost.LoggerSystemModule;
 
 import lombok.RequiredArgsConstructor;
+import org.localhost.exceptions.AccessDeniedException;
+import org.localhost.exceptions.LogNotFoundException;
+import org.localhost.exceptions.UserNotFoundException;
+import org.localhost.interfaces.LoggerSystemInterface;
 import org.localhost.userModule.User;
 import org.localhost.userModule.UserService;
 import org.springframework.stereotype.Service;
@@ -23,22 +27,19 @@ public class LoggerSystem implements LoggerSystemInterface {
         activeLogs.add(log);
     }
 
-    public void deleteLog(long logId, long userId) {
-        validateDeleteLogInput(logId);
-        User user = userService.getUserData(userId).orElse(null);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
+    public void deleteLog(long logId, long userId) throws UserNotFoundException, AccessDeniedException, LogNotFoundException {
+        User user = userService.getUserData(userId).orElseThrow(UserNotFoundException::new);
         Log logToDelete = findLogById(logId);
         validateLogAccessOrThrow(user, logToDelete);
+        validateDeleteLogInput(logId);
         performLogDeletion(logToDelete);
     }
 
-    private void validateLogAccessOrThrow(User user, Log log) {
+    private void validateLogAccessOrThrow(User user, Log log) throws AccessDeniedException {
         try {
             validateLogAccess(user, log);
         } catch (AccessDeniedException e) {
-            throw new RuntimeException(e);
+            throw e;
         }
     }
 
@@ -47,34 +48,44 @@ public class LoggerSystem implements LoggerSystemInterface {
         activeLogs.remove(log);
     }
 
-    private Log findLogById(long logId) {
-        return activeLogs.stream()
-                .filter(log -> log.getId() == logId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Log not found"));
+    private Log findLogById(long logId) throws LogNotFoundException {
+        try {
+            return activeLogs.stream()
+                    .filter(log -> log.getId() == logId)
+                    .findFirst()
+                    .orElseThrow(LogNotFoundException::new);
+        } catch (LogNotFoundException e) {
+            throw e;
+        }
     }
 
     //    TODO switch + dedykowane metody
-    public Set<Log> getLogsForUser(long userId) {
-        if (!userService.userExists(userId)) {
-            throw new IllegalArgumentException("User not found");
+    public Set<Log> getLogsForUser(long userId) throws UserNotFoundException {
+        try {
+            if (!userService.userExists(userId)) {
+                throw new UserNotFoundException();
+            }
+        } catch (UserNotFoundException e) {
+            throw e;
         }
-        User user = userService.getUserData(userId).orElse(null);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-        return getResultSetForUserAccessLevel(user);
 
+        try {
+            User user = userService.getUserData(userId).orElseThrow(UserNotFoundException::new);
+            return getResultSetForUserAccessLevel(user);
+        } catch (UserNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
+
+        return null;
     }
 
     private Set<Log> getResultSetForUserAccessLevel(User user) {
-        Set<Log> resultSet = new HashSet<>();
-        switch (user.getLogAccessType()) {
-            case OWNER -> resultSet = handleOwnerLogs();
-            case ADMIN -> resultSet = handleAdminLogs(user);
-            case BASIC -> resultSet = handleBasicUserLogs(user);
-        }
-        return resultSet;
+        return switch (user.getLogAccessType()) {
+            case OWNER -> handleOwnerLogs();
+            case ADMIN -> handleAdminLogs(user);
+            case BASIC -> handleBasicUserLogs(user);
+        };
     }
 
     private Set<Log> handleBasicUserLogs(User user) {
@@ -96,18 +107,15 @@ public class LoggerSystem implements LoggerSystemInterface {
         return Stream.of(basicUsersLogs, userLogs)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
-    }
+    };
 
     private Set<Log> handleOwnerLogs() {
         return new HashSet<>(activeLogs);
     }
 
-    private void validateDeleteLogInput(Long logId) {
-        if (logId == null) {
-            throw new IllegalArgumentException("LogId cannot be null");
-        }
+    private void validateDeleteLogInput(long logId) throws LogNotFoundException {
         if (activeLogs.isEmpty()) {
-            throw new IllegalStateException("There are no registered active logs");
+            throw new LogNotFoundException();
         }
     }
 
@@ -115,10 +123,10 @@ public class LoggerSystem implements LoggerSystemInterface {
         LogAccessType userAccessType = user.getLogAccessType();
         LogAccessType logAccessType = logToVerify.getLogAccessType();
         if (userAccessType == LogAccessType.ADMIN && logAccessType == LogAccessType.OWNER) {
-            throw new AccessDeniedException("Access denied!");
+            throw new AccessDeniedException();
         }
         if (userAccessType == LogAccessType.BASIC && logAccessType != LogAccessType.BASIC) {
-            throw new AccessDeniedException("Access denied!");
+            throw new AccessDeniedException();
 
         }
     }
@@ -128,6 +136,6 @@ public class LoggerSystem implements LoggerSystemInterface {
     }
 
     public List<Log> getDeletedLogs() {
-        return  new ArrayList<>(deletedLogs);
+        return new ArrayList<>(deletedLogs);
     }
 }

@@ -34,11 +34,11 @@ class UserServiceTest {
 
         Assertions.assertEquals(
                 expectedUsers.get(0).getUserId(),
-                objectUnderTest.getUsers().get(0).getUserId()
+                objectUnderTest.getAllUsers().get(0).getUserId()
         );
         Assertions.assertEquals(
                 expectedUsers.get(1).getUserId(),
-                objectUnderTest.getUsers().get(1).getUserId()
+                objectUnderTest.getAllUsers().get(1).getUserId()
         );
     }
 

@@ -1,15 +1,13 @@
 package org.localhost.userModule;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.localhost.LoggerSystemModule.LogAccessType;
+import org.localhost.interfaces.UserServiceInterface;
 import org.springframework.stereotype.Service;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 
-@Getter
-@Setter
 @Service
 public class UserService implements UserServiceInterface {
     private final LinkedList<User> users = new LinkedList<>();
@@ -33,6 +31,10 @@ public class UserService implements UserServiceInterface {
         return users.stream()
                 .filter(user -> user.getUserId() == userId)
                 .findFirst();
+    }
+
+    public List<User> getAllUsers() {
+        return List.copyOf(users);
     }
 
 }
